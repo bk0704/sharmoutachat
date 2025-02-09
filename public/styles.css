@@ -1,0 +1,60 @@
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    font-family: monospace;
+}
+
+/* ✅ Force chat box to take all available space */
+#chat-box-container {
+    flex-grow: 1; /* ✅ Allows it to expand */
+    overflow-y: auto; /* ✅ Enables scrolling */
+    border-top: 2px solid black;
+}
+
+/* ✅ Chat messages stay inside and don’t overflow */
+#chat-box {
+    position: relative;
+    top: 4em;
+    bottom: 0;
+    margin-bottom: 5em;
+    padding: 0.5em;
+    min-height: calc(100vh - 7em);
+    white-space: pre-wrap;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+}
+
+.chat-message {
+    margin: 0;
+    padding: 2px 0;
+    font-family: monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+}
+
+.chat-message b {
+    font-weight: bold;
+}
+
+
+
+#input-container {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4em;
+}
+
+#input-iframe {
+    width: 100%;
+    height: 4em;
+    border: 0;
+    box-shadow: 5px 5px 5px grey;
+    border-radius: 0 0 9px 9px;
+}
+
