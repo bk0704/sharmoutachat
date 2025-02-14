@@ -45,37 +45,60 @@ router.get('/', auth.checkUserSession, async (req, res) => {
 
             if (lastMessageID > 0) {
                 query = sql`SELECT id, username, message, timestamp FROM messages 
-                        WHERE id > ${lastMessageID} 
-                        ORDER BY id ASC`;
+                    WHERE id > ${lastMessageID} 
+                    ORDER BY id ASC`;
             } else {
                 query = sql`SELECT id, username, message FROM messages 
-                        ORDER BY id ASC LIMIT 50`; // Load last 50 messages initially
+                    ORDER BY id ASC LIMIT 50`;
             }
 
             const messages = await query;
-            console.log("Messages retrieved:", messages.length);
 
-            if (messages.length > 0) {
-                console.log("First message:", messages[0]);
-                console.log("Last message:", messages[messages.length - 1]);
-            }
+            if (!clients[username]) clients[username] = { lastPMID: 0 };
 
-            if (messages.length > 0) {
+            let lastPMID = clients[username].lastPMID;
+
+            // Fetch private messages meant for the current user
+            const privateMessages = await sql`
+            SELECT id, sender, recipient, message, timestamp 
+            FROM private_messages 
+            WHERE (recipient = ${username} OR sender = ${username}) 
+            AND id > ${lastPMID}
+            ORDER BY id ASC`;
+
+            if (messages.length > 0 || privateMessages.length > 0) {
                 for (const msg of messages) {
                     const timestampUTC = new Date(msg.timestamp);
                     const estTime = timestampUTC.toLocaleTimeString('en-US', {
                         timeZone: 'America/New_York',
                         hour: '2-digit',
                         minute: '2-digit',
-                        hour12: false  // 24-hour format
+                        hour12: false
                     });
-                    res.write(`<p id="message-${msg.id}" class="chat-message"><span class="timestamp">[${estTime}]</span><b>${msg.username}:</b> ${msg.message}</p>\n`);
-                }
-                lastMessageID = messages[messages.length - 1].id;
-                console.log("Updated lastMessageID to:", lastMessageID);
-                res.write("\n");
-            }
 
+                    res.write(`<p class="chat-message"><span class="timestamp">[${estTime}]</span> <b>${msg.username}:</b> ${msg.message}</p>\n`);
+                }
+
+                for (const pm of privateMessages) {
+                    const timestampUTC = new Date(pm.timestamp);
+                    const estTime = timestampUTC.toLocaleTimeString('en-US', {
+                        timeZone: 'America/New_York',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+
+                    let pmClass = pm.sender === username ? "private-message-sent" : "private-message-received";
+                    let pmPrefix = pm.sender === username ? `(PM to ${pm.recipient})` : `(PM from ${pm.sender})`;
+
+                    res.write(`<p class="${pmClass}"><span class="timestamp">[${estTime}]</span> <b>${pmPrefix}:</b> ${pm.message}</p>\n`);
+                }
+
+                lastMessageID = messages.length > 0 ? messages[messages.length - 1].id : lastMessageID;
+                if (privateMessages.length > 0) {
+                    clients[username].lastPMID = privateMessages[privateMessages.length - 1].id;
+                }
+            }
             console.log("Writing message inside chat-box:", messages.username, messages.message);
         } catch (err) {
             console.error("Error streaming messages:", err);
@@ -115,6 +138,12 @@ router.get('/', auth.checkUserSession, async (req, res) => {
     });
 
 });
+
+router.get('/users/online', async (req, res) => {
+    const users = await sql`SELECT username FROM users WHERE status = TRUE`;
+    res.json(users);
+});
+
 
 module.exports = router;
 
