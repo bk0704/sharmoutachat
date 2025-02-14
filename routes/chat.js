@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const sql = require('../config/database');
+const { DateTime } = require('luxon')
 
 const clients = []; // Stores all connected users
 
@@ -29,10 +30,8 @@ router.get('/', auth.checkUserSession, async (req, res) => {
         </head>
         <body>
             <div id="chat-container">
-                <h1>Welcome, ${username}!</h1>
-                <p>Online Users: ${userList}</p>
-                <div id="chat-box-container">
-                    <pre id="chat-box">
+                <!--<iframe src="/messages/input" id="input-iframe" scrolling="no"></iframe>-->
+                <pre id="chat-box">
     `);
 
     res.flushHeaders();
@@ -45,7 +44,7 @@ router.get('/', auth.checkUserSession, async (req, res) => {
             let query;
 
             if (lastMessageID > 0) {
-                query = sql`SELECT id, username, message FROM messages 
+                query = sql`SELECT id, username, message, timestamp FROM messages 
                         WHERE id > ${lastMessageID} 
                         ORDER BY id ASC`;
             } else {
@@ -63,8 +62,14 @@ router.get('/', auth.checkUserSession, async (req, res) => {
 
             if (messages.length > 0) {
                 for (const msg of messages) {
-                    console.log("Writing inside chat-box:", msg.username, msg.message);
-                    res.write(`<p id="message-${msg.id}" class="chat-message"><b>${msg.username}:</b> ${msg.message}</p>\n`);
+                    const timestampUTC = new Date(msg.timestamp);
+                    const estTime = timestampUTC.toLocaleTimeString('en-US', {
+                        timeZone: 'America/New_York',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false  // 24-hour format
+                    });
+                    res.write(`<p id="message-${msg.id}" class="chat-message"><span class="timestamp">[${estTime}]</span><b>${msg.username}:</b> ${msg.message}</p>\n`);
                 }
                 lastMessageID = messages[messages.length - 1].id;
                 console.log("Updated lastMessageID to:", lastMessageID);
@@ -81,9 +86,8 @@ router.get('/', auth.checkUserSession, async (req, res) => {
     await sendNewMessages();
 
 
-
     // Keep track of this client
-    clients.push({ res, lastMessageID });
+    clients.push({res, lastMessageID});
 
     // Periodically check for new messages
     const interval = setInterval(async () => {
@@ -94,6 +98,10 @@ router.get('/', auth.checkUserSession, async (req, res) => {
         }
     }, 2000); // Check for new messages every 2 seconds
 
+    res.write('<iframe src="/messages/input" id="input-iframe" scrolling="no" style="height: 6em; width: 100%;"></iframe>\n');
+
+    /*res.write('</div></div></body></html>')*/
+
 
     // Handle client disconnection
     req.on('close', async () => {
@@ -102,20 +110,10 @@ router.get('/', auth.checkUserSession, async (req, res) => {
         clients.splice(clients.findIndex(c => c.res === res), 1);
         if (username) {
             await sql`UPDATE users SET status = FALSE WHERE username = ${username}`;
-            await sql`DELETE FROM users WHERE status = FALSE`;
+            await sql`DELETE FROM users WHERE status = FALSE AND is_guest = TRUE`;
         }
     });
 
-    res.write(`</pre>`); // ✅ Close chat-box only after messages are streamed
-    res.write(`</div>`); // ✅ Close chat-box-container properly
-
-    res.write(`
-        <div id="input-container">
-            <iframe src="/messages/input" id="input-iframe" scrolling="no"></iframe>
-        </div>
-    </div> <!-- Closing chat-container -->
-</body></html>
-    `);
 });
 
 module.exports = router;

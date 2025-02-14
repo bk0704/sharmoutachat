@@ -1,60 +1,174 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    margin:0
+}
+
+p {
+    margin-bottom:0
+}
+
+p b {
+    overflow:hidden
+}
+
 #chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-    font-family: monospace;
+    top:0;
+    left:0;
+    overflow:hidden;
+    background: linear-gradient(135deg, #1a1a1a, #111);
 }
 
-/* ✅ Force chat box to take all available space */
-#chat-box-container {
-    flex-grow: 1; /* ✅ Allows it to expand */
-    overflow-y: auto; /* ✅ Enables scrolling */
-    border-top: 2px solid black;
-}
 
-/* ✅ Chat messages stay inside and don’t overflow */
 #chat-box {
-    position: relative;
-    top: 4em;
-    bottom: 0;
-    margin-bottom: 5em;
-    padding: 0.5em;
-    min-height: calc(100vh - 7em);
-    white-space: pre-wrap;
-    display: flex;
-    flex-direction: column-reverse;
-    overflow-y: auto;
+    position:relative;
+    top:4em;
+    bottom:0;
+    margin-bottom:3em;
+    padding:3em;
+    min-height:calc(100vh - 7em);
+    white-space:pre-wrap;
+    display:flex;
+    flex-direction:column-reverse;
 }
+
 
 .chat-message {
-    margin: 0;
-    padding: 2px 0;
-    font-family: monospace;
-    font-size: 14px;
-    white-space: pre-wrap;
+    line-height: 1.5; /* Improves readability */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Subtle glow */
+    background: rgba(255, 255, 255, 0.1); /* Light tint */
+    color: white;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    display: inline-block;
+    max-width: 100%;
 }
 
-.chat-message b {
-    font-weight: bold;
+.timestamp{
+    font-size: 12px;
+    color: gray;
 }
 
-
-
-#input-container {
-    position: fixed;
-    z-index: 2;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4em;
+.chat-message b{
+    color: #2cff05;
 }
+
+/*.chat-message:last-child {
+    margin-bottom: 0; !* Ensures the last message doesn't float *!
+}*/
+
 
 #input-iframe {
-    width: 100%;
-    height: 4em;
-    border: 0;
-    box-shadow: 5px 5px 5px grey;
-    border-radius: 0 0 9px 9px;
+    position:fixed;
+    background: linear-gradient(to bottom, #222, #000);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);;
+    z-index:2;
+    top:0;
+    left:0;
+    box-sizing:border-box;
+    box-shadow:5px 5px 5px grey;
+    border-radius: 0 0 10px 10px;
+    width:100%;
+    height:4em;
+}
+
+
+
+#input-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+/*    width: 100%;
+    height: 100%;*/
+    box-sizing: border-box;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.8); /* Slight transparency for better UX */
+}
+
+.auth-page{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1a1a1a, #111);
+    color: white;
+}
+
+.auth-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.auth-container h2 {
+    margin-bottom: 10px;
+}
+
+.auth-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-container input[type="text"],
+.auth-container input[type="password"] {
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.auth-container input[type="submit"] {
+    background: #2cff05;
+    color: black;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.auth-container a {
+    color: #2cff05;
+    text-decoration: none;
+}
+
+.rules-container {
+    background: rgba(255, 255, 255, 0.1); /* Light transparency for a sleek effect */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.5); /* Soft shadow for depth */
+    text-align: center;
+    margin-top: 20px; /* Adds spacing below the login box */
+    width: 80%;
+    max-width: 500px;
+}
+
+.rules-container h2 {
+    color: #2cff05; /* Matches the theme's green highlight */
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.rules-container ol {
+    list-style: none; /* Removes default numbering */
+    padding: 0;
+    text-align: left;
+}
+
+.rules-container ol li {
+    background: rgba(0, 0, 0, 0.5); /* Darker background for contrast */
+    padding: 8px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
 }
 

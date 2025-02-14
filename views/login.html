@@ -8,6 +8,7 @@
     <form method="post" action="/users/login">
         <label for="username">Enter in a username</label>
         <input type="text" id="username" name="username" required autocomplete="off">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <input type="submit" value="Submit">
     </form>
 </body>

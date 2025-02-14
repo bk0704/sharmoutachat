@@ -9,7 +9,8 @@
     <body>
         <div id="input-wrapper">
             <form method="post" action="/messages/send">
-                <input type="text" id="message" name="message" required autocomplete="off">
+                <input type="text" id="message" name="message" required autocomplete="off" style="width: 90%; height: 2em; padding: 5px; font-size: 14px;">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <input type="submit" value="Send">
             </form>
         </div>
