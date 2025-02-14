@@ -5,6 +5,7 @@ const port = 3000;
 const cookieParser = require('cookie-parser');  // ✅ Required for CSRF cookies
 const session = require('express-session');
 const csurf = require('csurf');
+require("dotenv").config();
 
 // Load Middleware
 const rateLimit = require('./middleware/rateLimit');
@@ -20,7 +21,7 @@ const messageRoutes = require('./routes/messages');
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());  // ✅ Must be before CSRF
 app.use(session({
-    secret: 'your-secret-key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
